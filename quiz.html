@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Balance Quiz Game</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    #timer-bar {
+      position: fixed;
+      right: 20px;
+      top: 20px;
+      width: 20px;
+      height: 200px;
+      background-color: #ddd;
+      border-radius: 10px;
+    }
+    #timer-fill {
+      width: 100%;
+      height: 0%;
+      background-color: #ff0000;
+      border-radius: 10px;
+    }
+    .weight {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background: gray;
+      border-radius: 50%;
+      animation: drop 1s ease-out forwards;
+    }
+    @keyframes drop {
+      0% { top: 0; opacity: 0; transform: scale(0.5) rotate(0deg); }
+      30% { top: 50%; opacity: 0.5; transform: scale(1) rotate(20deg); }
+      50% { top: 70%; opacity: 1; transform: scale(1.1) rotate(-15deg); }
+      70% { top: 90%; opacity: 1; transform: scale(1) rotate(10deg); }
+      100% { top: 110px; opacity: 1; transform: scale(1) rotate(0deg); }
+    }
+  </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4 bg-cover bg-center bg-fixed" style="background-image: linear-gradient(rgba(59,130,246,0.6), rgba(139,92,246,0.6)), url('https://i.imgflip.com/2qkodw.jpg?a484440');">
+  
+  <!-- Timer -->
+  <div id="timer-bar"><div id="timer-fill"></div></div>
+
+  <!-- Scale -->
+  <div class="relative mb-10 w-64 h-48 flex items-center justify-center">
+    <img id="scale" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsEQazHWt18zAXh2IZYGQy0S-5cNvUlM7nsw&s" class="w-full">
+    <div id="left-weights" class="absolute left-10 top-10"></div>
+    <div id="right-weights" class="absolute right-10 top-10"></div>
+  </div>
+
+  <!-- Question -->
+  <div id="question-box" class="bg-white p-6 rounded shadow-md text-center w-full max-w-md">
+    <p id="question-text" class="text-lg font-medium mb-4"></p>
+    <div id="answers" class="space-y-2"></div>
+  </div>
+
+  <!-- Result -->
+  <div id="result-box" class="hidden mt-6 text-2xl font-bold text-center bg-white p-6 rounded-lg shadow-lg w-full max-w-md mx-auto">
+    <div id="result" class="mt-4"></div>
+    <a href="index.html">
+      <button class="mt-4 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">Play Again</button>
+    </a>
+  </div>
+
+  <!-- Sounds -->
+  <audio id="drop-sound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_220a2ad759.mp3?filename=plop-103130.mp3"></audio>
+  <audio id="timer-sound" src="https://cdn.pixabay.com/download/audio/2021/12/23/audio_8fdf2eb407.mp3?filename=alarm-83622.mp3"></audio>
+
+  <script>
+    const questions = [
+      { question: "What does RFIE stand for?", options: ["Remove Friends Increase Enemies", "Recover Funds Improve Execution", "Ronaldo Freekick in Etihad", "Remove Friction Increase Expressivity"], answer: 3 },
+      { question: "Fluent works with?", options: ["multiVM execution", "parallel execution", "blended execution", "cross-app execution"], answer: 2 },
+      { question: "What the hell is rWASM?", options: ["Rogue Wireless Access Systemic Machine", "Real-time Web App Scripting Machine", "Reduced Web Assembly", "Real-time Web-Amalgamation Simulator"], answer: 2 },
+      { question: "Which element has the chemical symbol O?", options: ["Oxygen", "Gold", "Silver", "Hydrogen"], answer: 0 },
+      { question: "How many continents are there?", options: ["5", "6", "7", "8"], answer: 2 }
+    ];
+
+    let currentQuestion = 0;
+    let leftWeight = 0;
+    let rightWeight = 0;
+    let timer, remainingTime = 15;
+
+    const scale = document.getElementById("scale");
+    const dropSound = document.getElementById("drop-sound");
+    const timerSound = document.getElementById("timer-sound");
+
+    function updateTimer() {
+      const fill = document.getElementById("timer-fill");
+      fill.style.height = (remainingTime / 15) * 100 + "%";
+      if (remainingTime <= 3) timerSound.play();
+      if (remainingTime-- <= 0) {
+        clearInterval(timer);
+        answer(-1);
+      }
+    }
+
+    function showQuestion() {
+      const q = questions[currentQuestion];
+      document.getElementById("question-text").textContent = q.question;
+      const answersDiv = document.getElementById("answers");
+      answersDiv.innerHTML = "";
+
+      q.options.forEach((opt, i) => {
+        const btn = document.createElement("button");
+        btn.textContent = opt;
+        btn.className = "bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded w-full";
+        btn.onclick = () => answer(i);
+        answersDiv.appendChild(btn);
+      });
+
+      remainingTime = 15;
+      updateTimer();
+      clearInterval(timer);
+      timer = setInterval(updateTimer, 1000);
+    }
+
+    function addWeight(side) {
+      const weight = document.createElement("div");
+      weight.className = "weight";
+      if (side === "left") document.getElementById("left-weights").appendChild(weight);
+      else document.getElementById("right-weights").appendChild(weight);
+      dropSound.play();
+    }
+
+    function answer(index) {
+      clearInterval(timer);
+      const correct = questions[currentQuestion].answer;
+      index === correct ? (rightWeight++, addWeight("right")) : (leftWeight++, addWeight("left"));
+      currentQuestion++;
+      updateScale();
+      if (currentQuestion < questions.length) setTimeout(showQuestion, 500);
+      else setTimeout(endGame, 1000);
+    }
+
+    function updateScale() {
+      const tilt = (rightWeight - leftWeight) * 5;
+      scale.style.transform = `rotate(${tilt}deg)`;
+    }
+
+    function endGame() {
+      document.getElementById("question-box").classList.add("hidden");
+      document.getElementById("result-box").classList.remove("hidden");
+      const result = document.getElementById("result");
+      if (rightWeight > leftWeight) {
+        result.textContent = "🎉 Congrats You're Blended!";
+        result.className = "text-green-600";
+      } else {
+        result.textContent = "❌ Sorry not Blended enough";
+        result.className = "text-red-600";
+      }
+    }
+
+    // Start the game
+    showQuestion();
+  </script>
+</body>
+</html>
