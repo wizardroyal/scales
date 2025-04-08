@@ -137,6 +137,9 @@
     function endGame() {
       document.body.style.backgroundColor = "#4b0082"; // Deep bluish purple
       document.getElementById("splash-screen").classList.add("hidden");
+      document.getElementById("question-box").classList.add("hidden");
+      document.getElementById("timer-bar").classList.add("hidden");
+
       const goodbyeMessage = document.createElement("h1");
       goodbyeMessage.textContent = "Goodbye!";
       goodbyeMessage.classList.add("text-4xl", "font-bold", "text-white");
@@ -233,4 +236,9 @@
     }
 
     function updateScale() {
-      const tilt =
+      const tilt = (rightWeight - leftWeight) * 10; // Adjust scale tilt based on weight difference
+      scale.style.transform = `rotate(${tilt}deg)`;
+    }
+  </script>
+</body>
+</html>
