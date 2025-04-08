@@ -15,34 +15,36 @@
       height: 30px;
       background: gray;
       border-radius: 50%;
-      animation: drop 0.7s ease-out;
+      animation: drop 1s ease-out forwards;
     }
     @keyframes drop {
-      0% { top: 0; opacity: 0; }
-      100% { top: 100px; opacity: 1; }
+      0% {
+        top: 0;
+        opacity: 0;
+        transform: scale(0.5);
+      }
+      60% {
+        top: 100px;
+        opacity: 1;
+        transform: scale(1);
+      }
+      100% {
+        top: 110px; /* Slightly lower to simulate sitting on the pan */
+        opacity: 1;
+        transform: scale(1);
+      }
     }
   </style>
 </head>
-<body class="flex flex-col items-center justify-center min-h-screen p-4" style="
-  background-image: linear-gradient(rgba(59, 130, 246, 0.6), rgba(139, 92, 246, 0.6)), 
-                    url('https://i.imgflip.com/2qkodw.jpg?a484440');
-  background-position: center center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-attachment: fixed;
-">
-  <h1 class="text-3xl font-bold mb-12" style="text-shadow: 2px 2px 5px rgba(255, 255, 255, 0.7);">
-    Are you blended?
-  </h1>
+<body class="flex flex-col items-center justify-center min-h-screen p-4" style="background-image: linear-gradient(rgba(59, 130, 246, 0.6), rgba(139, 92, 246, 0.6)), url('https://i.imgflip.com/2qkodw.jpg?a484440'); background-position: center center; background-repeat: no-repeat; background-size: cover; background-attachment: fixed;">
+  <h1 class="text-3xl font-bold mb-12" style="text-shadow: 2px 2px 5px rgba(255, 255, 255, 0.7);">Are you blended?</h1>
 
   <!-- Scale Container -->
-
   <div class="relative mb-10 w-64 h-48 flex items-center justify-center">
     <img id="scale" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsEQazHWt18zAXh2IZYGQy0S-5cNvUlM7nsw&s" alt="Scale" class="w-full">
     <div id="left-weights" class="absolute left-10 top-10"></div>
     <div id="right-weights" class="absolute right-10 top-10"></div>
   </div>
-
 
   <!-- Question Box -->
   <div id="question-box" class="bg-white p-6 rounded shadow-md text-center w-full max-w-md">
@@ -52,11 +54,9 @@
 
   <!-- Result + Retry -->
   <div id="result-box" class="hidden mt-6 text-2xl font-bold text-center bg-white p-6 rounded-lg shadow-lg w-full max-w-md mx-auto">
-    <div id="result" class="mt-4"></div>
-    <button id="retry" onclick="restartGame()" class="mt-4 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">ReBlend?</button>
+    <div id="result" class="hidden mt-4"></div>
+    <button id="retry" onclick="restartGame()" class="hidden mt-4 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">ReBlend?</button>
   </div>
-
-
 
   <!-- Sound -->
   <audio id="drop-sound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_220a2ad759.mp3?filename=plop-103130.mp3"></audio>
@@ -135,12 +135,9 @@
       const resultBox = document.getElementById("result-box");
       const result = document.getElementById("result");
       const retry = document.getElementById("retry");
-    
-      // Make sure the result box and retry button are visible
       resultBox.classList.remove("hidden");
       retry.classList.remove("hidden");
     
-      // Display the appropriate message
       if (rightWeight > leftWeight) {
         result.textContent = "🎉 Congrats You're Blended!";
         result.classList.add("text-green-600");
@@ -163,10 +160,4 @@
       leftContainer.innerHTML = "";
       rightContainer.innerHTML = "";
       scale.style.transform = "rotate(0deg)";
-      showQuestion();
-    }
-
-    showQuestion();
-  </script>
-</body>
-</html>
+     
