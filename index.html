@@ -230,7 +230,6 @@
     }
 
     function nextQuestion() {
-      currentQuestion++;
       if (currentQuestion < questions.length) {
         showQuestion();
       } else {
@@ -260,4 +259,12 @@
       leftWeight = 0;
       rightWeight = 0;
       document.getElementById("question-box").classList.remove("hidden");
-      document.getElementById("result").classList.add
+      document.getElementById("result-box").classList.add("hidden");
+      showQuestion();
+    }
+
+    // Start the game
+    showQuestion();
+  </script>
+</body>
+</html>
