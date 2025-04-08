@@ -43,6 +43,32 @@
     .result-text.show {
       opacity: 1;
     }
+    /* Bomb explosion animation */
+    @keyframes explode {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.5);
+        opacity: 0.5;
+      }
+      100% {
+        transform: scale(0);
+        opacity: 0;
+      }
+    }
+    .explosion {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 50px;
+      height: 50px;
+      background-color: red;
+      border-radius: 50%;
+      animation: explode 1s ease-out forwards;
+    }
   </style>
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen p-4" style="background-image: linear-gradient(rgba(59, 130, 246, 0.6), rgba(139, 92, 246, 0.6)), url('https://i.imgflip.com/2qkodw.jpg?a484440'); background-position: center center; background-repeat: no-repeat; background-size: cover; background-attachment: fixed;">
@@ -59,6 +85,7 @@
   <div id="question-box" class="bg-white p-6 rounded shadow-md text-center w-full max-w-md">
     <p id="question-text" class="text-lg font-medium mb-4"></p>
     <div id="answers" class="space-y-2"></div>
+    <p id="timer" class="mt-4 text-xl font-semibold">15</p>
   </div>
 
   <!-- Result + Retry -->
@@ -87,11 +114,39 @@
     let currentQuestion = 0;
     let leftWeight = 0;
     let rightWeight = 0;
+    let timer;
+    let timeLeft = 15;
 
     const scale = document.getElementById("scale");
     const leftContainer = document.getElementById("left-weights");
     const rightContainer = document.getElementById("right-weights");
     const dropSound = document.getElementById("drop-sound");
+    const timerDisplay = document.getElementById("timer");
+
+    function startTimer() {
+      timeLeft = 15;
+      timerDisplay.textContent = timeLeft;
+      timer = setInterval(() => {
+        timeLeft--;
+        timerDisplay.textContent = timeLeft;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          triggerExplosion();
+          setTimeout(() => {
+            nextQuestion();
+          }, 1000);
+        }
+      }, 1000);
+    }
+
+    function triggerExplosion() {
+      const explosion = document.createElement("div");
+      explosion.className = "explosion";
+      document.body.appendChild(explosion);
+      setTimeout(() => {
+        explosion.remove();
+      }, 1000);
+    }
 
     function showQuestion() {
       const q = questions[currentQuestion];
@@ -106,6 +161,8 @@
         btn.onclick = () => answer(index);
         answersDiv.appendChild(btn);
       });
+
+      startTimer();
     }
 
     function addWeight(side) {
@@ -117,35 +174,36 @@
     }
 
     function answer(selectedIndex) {
+      clearInterval(timer); // Stop the timer
       const correct = questions[currentQuestion].answer;
-      const btns = document.querySelectorAll("#answers button");
       if (selectedIndex === correct) {
-        btns[selectedIndex].classList.add("bg-green-500");
+        rightWeight++;
+        addWeight("right");
       } else {
-        btns[selectedIndex].classList.add("bg-red-500");
+        leftWeight++;
+        addWeight("left");
       }
-      
-      setTimeout(() => {
-        if (selectedIndex === correct) {
-          rightWeight++;
-          addWeight("right");
-        } else {
-          leftWeight++;
-          addWeight("left");
-        }
-        currentQuestion++;
-        updateScale();
-        if (currentQuestion < questions.length) {
-          showQuestion();
-        } else {
-          endGame();
-        }
-      }, 500);
+      currentQuestion++;
+      updateScale();
+      if (currentQuestion < questions.length) {
+        setTimeout(showQuestion, 300);
+      } else {
+        setTimeout(endGame, 800);
+      }
     }
 
     function updateScale() {
       const tilt = (rightWeight - leftWeight) * 5;
       scale.style.transform = `rotate(${tilt}deg)`;
+    }
+
+    function nextQuestion() {
+      currentQuestion++;
+      if (currentQuestion < questions.length) {
+        showQuestion();
+      } else {
+        endGame();
+      }
     }
 
     function endGame() {
