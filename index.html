@@ -6,6 +6,47 @@
   <title>Balance Quiz Game</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
+    /* Splash Screen Styles */
+    #splash-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(75, 0, 130, 0.8), rgba(72, 61, 139, 0.8));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 2rem;
+      text-align: center;
+      flex-direction: column;
+      transition: opacity 0.5s ease-out;
+    }
+
+    /* Hide Splash Screen */
+    .hidden {
+      display: none;
+    }
+
+    /* Timer Bar (Right Side) */
+    #timer-bar {
+      position: fixed;
+      right: 20px;
+      top: 20px;
+      width: 20px;
+      height: 200px;
+      background-color: #ddd;
+      border-radius: 10px;
+    }
+
+    #timer-fill {
+      width: 100%;
+      height: 0;
+      background-color: #ff0000;
+      border-radius: 10px;
+    }
+
     /* Improved Weight Drop Animation */
     .weight {
       position: absolute;
@@ -43,28 +84,17 @@
         transform: scale(1) rotate(0deg); /* Return to original scale and reset rotation */
       }
     }
-
-    /* Timer Bar (Right Side) */
-    #timer-bar {
-      position: fixed;
-      right: 20px;
-      top: 20px;
-      width: 20px;
-      height: 200px;
-      background-color: #ddd;
-      border-radius: 10px;
-    }
-
-    #timer-fill {
-      width: 100%;
-      height: 0;
-      background-color: #ff0000;
-      border-radius: 10px;
-    }
   </style>
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen p-4" style="background-image: linear-gradient(rgba(59, 130, 246, 0.6), rgba(139, 92, 246, 0.6)), url('https://i.imgflip.com/2qkodw.jpg?a484440'); background-position: center center; background-repeat: no-repeat; background-size: cover; background-attachment: fixed;">
-  <h1 class="text-3xl font-bold mb-12" style="text-shadow: 2px 2px 5px rgba(255, 255, 255, 0.7);">Are you blended?</h1>
+  <!-- Splash Screen -->
+  <div id="splash-screen">
+    <h1 class="text-4xl font-bold mb-4">DO YOU HAVE WHAT IT TAKES TO BE A CHEF?</h1>
+    <div>
+      <button onclick="startGame()" class="bg-green-500 hover:bg-green-600 text-white py-2 px-6 rounded m-2">YES</button>
+      <button onclick="endGame()" class="bg-red-500 hover:bg-red-600 text-white py-2 px-6 rounded m-2">NO</button>
+    </div>
+  </div>
 
   <!-- Timer Bar -->
   <div id="timer-bar">
@@ -72,14 +102,14 @@
   </div>
 
   <!-- Scale Container -->
-  <div class="relative mb-10 w-64 h-48 flex items-center justify-center">
+  <div class="relative mb-10 w-64 h-48 flex items-center justify-center hidden" id="game-screen">
     <img id="scale" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsEQazHWt18zAXh2IZYGQy0S-5cNvUlM7nsw&s" alt="Scale" class="w-full">
     <div id="left-weights" class="absolute left-10 top-10"></div>
     <div id="right-weights" class="absolute right-10 top-10"></div>
   </div>
 
   <!-- Question Box -->
-  <div id="question-box" class="bg-white p-6 rounded shadow-md text-center w-full max-w-md">
+  <div id="question-box" class="bg-white p-6 rounded shadow-md text-center w-full max-w-md hidden">
     <p id="question-text" class="text-lg font-medium mb-4"></p>
     <div id="answers" class="space-y-2"></div>
   </div>
@@ -95,6 +125,24 @@
   <audio id="timer-sound" src="https://cdn.pixabay.com/download/audio/2021/12/23/audio_8fdf2eb407.mp3?filename=alarm-83622.mp3"></audio>
 
   <script>
+    // Function to start the game after clicking "YES"
+    function startGame() {
+      document.getElementById("splash-screen").classList.add("hidden");
+      document.getElementById("game-screen").classList.remove("hidden");
+      document.getElementById("question-box").classList.remove("hidden");
+      showQuestion(); // Start showing questions
+    }
+
+    // Function to end the game and show goodbye message after clicking "NO"
+    function endGame() {
+      document.body.style.backgroundColor = "#4b0082"; // Deep bluish purple
+      document.getElementById("splash-screen").classList.add("hidden");
+      const goodbyeMessage = document.createElement("h1");
+      goodbyeMessage.textContent = "Goodbye!";
+      goodbyeMessage.classList.add("text-4xl", "font-bold", "text-white");
+      document.body.appendChild(goodbyeMessage);
+    }
+
     const questions = [
       { question: "What does RFIE stand for?", options: ["Remove Friends Increase Enemies", "Recover Funds Improve Execution", "Ronaldo Freekick in Etihad", "Remove Friction Increase Expressivity"], answer: 3 },
       { question: "Fluent works with?", options: ["multiVM execution", "parallel execution", "blended execution", "cross-app execution"], answer: 2 },
@@ -180,49 +228,4 @@
       if (currentQuestion < questions.length) {
         setTimeout(showQuestion, 300);
       } else {
-        setTimeout(endGame, 800);
-      }
-    }
-
-    function updateScale() {
-      const tilt = (rightWeight - leftWeight) * 5;
-      scale.style.transform = `rotate(${tilt}deg)`;
-    }
-
-    function endGame() {
-      document.getElementById("question-box").classList.add("hidden");
-      const resultBox = document.getElementById("result-box");
-      const result = document.getElementById("result");
-      const retry = document.getElementById("retry");
-      resultBox.classList.remove("hidden");
-      retry.classList.remove("hidden");
-    
-      if (rightWeight > leftWeight) {
-        result.textContent = "🎉 Congrats You're Blended!";
-        result.classList.add("text-green-600");
-        result.classList.remove("text-red-600");
-      } else {
-        result.textContent = "❌ Sorry not Blended enough";
-        result.classList.add("text-red-600");
-        result.classList.remove("text-green-600");
-      }
-    }
-
-    function restartGame() {
-      currentQuestion = 0;
-      leftWeight = 0;
-      rightWeight = 0;
-      document.getElementById("question-box").classList.remove("hidden");
-      document.getElementById("result").classList.add("hidden");
-      document.getElementById("retry").classList.add("hidden");
-      document.getElementById("result").textContent = "";
-      leftContainer.innerHTML = "";
-      rightContainer.innerHTML = "";
-      scale.style.transform = "rotate(0deg)";
-      showQuestion();
-    }
-
-    showQuestion();
-  </script>
-</body>
-</html>
+        setTimeout(end
