@@ -1,16 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Scale Display</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Balance Game</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    #scale {
+      transition: transform 0.5s ease-in-out;
+    }
+  </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-  <div class="text-center">
-    <h1 class="text-3xl font-bold mb-6">Symbol of Balance</h1>
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Balance_scale_icon.svg/800px-Balance_scale_icon.svg.png" alt="Scale" class="w-64 mx-auto shadow-lg rounded-lg">
-    <p class="mt-4 text-gray-600">A classic scale representing fairness and justice.</p>
+<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen p-4">
+  <h1 class="text-3xl font-bold mb-6">Balance the Scale</h1>
+
+  <!-- Scale -->
+  <div class="relative mb-10">
+    <img id="scale" src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Balance_scale_icon.svg" alt="Scale" class="w-64 mx-auto">
   </div>
+
+  <!-- Question Area -->
+  <div id="question-box" class="bg-white p-6 rounded shadow-md text-center w-full max-w-md">
+    <p id="question-text" class="text-lg font-medium mb-4"></p>
+    <div class="space-y-2">
+      <button onclick="answer('left')" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded w-full">Left Side</button>
+      <button onclick="answer('right')" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded w-full">Right Side</button>
+    </div>
+  </div>
+
+  <!-- End Message -->
+  <div id="result" class="hidden mt-6 text-xl font-semibold"></div>
+
+  <script>
+    const questions = [
+      "Do you prefer logic or emotion?",
+      "Are you more introverted or extroverted?",
+      "Do you plan ahead or go with the flow?",
+      "Teamwork or solo missions?",
+      "Daydreamer or realist?",
+      "Rules or rebellion?",
+      "Messy or meticulous?",
+      "Forgive easily or hold grudges?",
+      "Think fast or think deep?",
+      "Adventure or comfort zone?"
+    ];
+
+    let currentQuestion = 0;
+    let leftWeight = 0;
+    let rightWeight = 0;
+
+    function showQuestion() {
+      if (currentQuestion < questions.length) {
+        document.getElementById("question-text").textContent = questions[currentQuestion];
+      } else {
+        endGame();
+      }
+    }
+
+    function answer(side) {
+      if (side === "left") leftWeight++;
+      else if (side === "right") rightWeight++;
+
+      currentQuestion++;
+      updateScale();
+      showQuestion();
+    }
+
+    function updateScale() {
+      const tilt = (rightWeight - leftWeight) * 5; // tilt angle
+      document.getElementById("scale").style.transform = `rotate(${tilt}deg)`;
+    }
+
+    function endGame() {
+      document.getElementById("question-box").classList.add("hidden");
+      const result = document.getElementById("result");
+      result.classList.remove("hidden");
+      if (leftWeight > rightWeight) {
+        result.textContent = "The scale tipped to the LEFT!";
+      } else if (rightWeight > leftWeight) {
+        result.textContent = "The scale tipped to the RIGHT!";
+      } else {
+        result.textContent = "Perfect balance! The scale is even.";
+      }
+    }
+
+    showQuestion();
+  </script>
 </body>
 </html>
