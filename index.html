@@ -8,6 +8,7 @@
   <style>
     #scale {
       transition: transform 0.5s ease-in-out;
+      transform-origin: center bottom;
     }
     .weight {
       position: absolute;
@@ -29,10 +30,18 @@
         transform: scale(1);
       }
       100% {
-        top: 110px; /* Slightly lower to simulate sitting on the pan */
+        top: 110px;
         opacity: 1;
         transform: scale(1);
       }
+    }
+    /* Add a slight fade-in effect to result text */
+    .result-text {
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+    }
+    .result-text.show {
+      opacity: 1;
     }
   </style>
 </head>
@@ -54,7 +63,7 @@
 
   <!-- Result + Retry -->
   <div id="result-box" class="hidden mt-6 text-2xl font-bold text-center bg-white p-6 rounded-lg shadow-lg w-full max-w-md mx-auto">
-    <div id="result" class="mt-4"></div>
+    <div id="result" class="mt-4 result-text"></div>
     <button id="retry" onclick="restartGame()" class="hidden mt-4 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">ReBlend?</button>
   </div>
 
@@ -109,20 +118,29 @@
 
     function answer(selectedIndex) {
       const correct = questions[currentQuestion].answer;
+      const btns = document.querySelectorAll("#answers button");
       if (selectedIndex === correct) {
-        rightWeight++;
-        addWeight("right");
+        btns[selectedIndex].classList.add("bg-green-500");
       } else {
-        leftWeight++;
-        addWeight("left");
+        btns[selectedIndex].classList.add("bg-red-500");
       }
-      currentQuestion++;
-      updateScale();
-      if (currentQuestion < questions.length) {
-        setTimeout(showQuestion, 300);
-      } else {
-        setTimeout(endGame, 800);
-      }
+      
+      setTimeout(() => {
+        if (selectedIndex === correct) {
+          rightWeight++;
+          addWeight("right");
+        } else {
+          leftWeight++;
+          addWeight("left");
+        }
+        currentQuestion++;
+        updateScale();
+        if (currentQuestion < questions.length) {
+          showQuestion();
+        } else {
+          endGame();
+        }
+      }, 500);
     }
 
     function updateScale() {
@@ -138,15 +156,13 @@
       resultBox.classList.remove("hidden");
       retry.classList.remove("hidden");
     
-      if (rightWeight > leftWeight) {
-        result.textContent = "🎉 Congrats You're Blended!";
-        result.classList.add("text-green-600");
-        result.classList.remove("text-red-600");
-      } else {
-        result.textContent = "❌ Sorry not Blended enough";
-        result.classList.add("text-red-600");
-        result.classList.remove("text-green-600");
-      }
+      const resultClass = rightWeight > leftWeight ? 'text-green-600' : 'text-red-600';
+      const resultText = rightWeight > leftWeight ? "🎉 Congrats You're Blended!" : "❌ Sorry not Blended enough";
+      
+      result.textContent = resultText;
+      result.classList.add(resultClass);
+      result.classList.remove(rightWeight > leftWeight ? 'text-red-600' : 'text-green-600');
+      result.classList.add('show');
     }
 
     function restartGame() {
@@ -154,9 +170,9 @@
       leftWeight = 0;
       rightWeight = 0;
       document.getElementById("question-box").classList.remove("hidden");
-      document.getElementById("result").classList.add("hidden");
-      document.getElementById("retry").classList.add("hidden");
+      document.getElementById("result-box").classList.add("hidden");
       document.getElementById("result").textContent = "";
+      document.getElementById("retry").classList.add("hidden");
       leftContainer.innerHTML = "";
       rightContainer.innerHTML = "";
       scale.style.transform = "rotate(0deg)";
