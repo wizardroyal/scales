@@ -69,10 +69,32 @@
       border-radius: 50%;
       animation: explode 1s ease-out forwards;
     }
+    /* Countdown bar */
+    #countdown-bar {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      width: 100%;
+      height: 10px;
+      background-color: #ddd;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+    #countdown-fill {
+      height: 100%;
+      background-color: #ff0000;
+      width: 100%;
+      transition: width 1s linear;
+    }
   </style>
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen p-4" style="background-image: linear-gradient(rgba(59, 130, 246, 0.6), rgba(139, 92, 246, 0.6)), url('https://i.imgflip.com/2qkodw.jpg?a484440'); background-position: center center; background-repeat: no-repeat; background-size: cover; background-attachment: fixed;">
   <h1 class="text-3xl font-bold mb-12" style="text-shadow: 2px 2px 5px rgba(255, 255, 255, 0.7);">Are you blended?</h1>
+
+  <!-- Countdown Bar -->
+  <div id="countdown-bar">
+    <div id="countdown-fill"></div>
+  </div>
 
   <!-- Scale Container -->
   <div class="relative mb-10 w-64 h-48 flex items-center justify-center">
@@ -96,6 +118,8 @@
 
   <!-- Sound -->
   <audio id="drop-sound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_220a2ad759.mp3?filename=plop-103130.mp3"></audio>
+  <audio id="tick-sound" src="https://www.soundjay.com/button/beep-07.wav"></audio>
+  <audio id="explode-sound" src="https://www.soundjay.com/button/sounds/explosion-01.mp3"></audio>
 
   <script>
     const questions = [
@@ -116,21 +140,23 @@
     let rightWeight = 0;
     let timer;
     let timeLeft = 15;
-
     const scale = document.getElementById("scale");
     const leftContainer = document.getElementById("left-weights");
     const rightContainer = document.getElementById("right-weights");
     const dropSound = document.getElementById("drop-sound");
-    const timerDisplay = document.getElementById("timer");
+    const tickSound = document.getElementById("tick-sound");
+    const explodeSound = document.getElementById("explode-sound");
+    const countdownFill = document.getElementById("countdown-fill");
 
     function startTimer() {
       timeLeft = 15;
-      timerDisplay.textContent = timeLeft;
-      timer = setInterval(() => {
+      countdownFill.style.width = "100%";
+      const tickInterval = setInterval(() => {
+        tickSound.play();
         timeLeft--;
-        timerDisplay.textContent = timeLeft;
+        countdownFill.style.width = `${(timeLeft / 15) * 100}%`;
         if (timeLeft <= 0) {
-          clearInterval(timer);
+          clearInterval(tickInterval);
           triggerExplosion();
           setTimeout(() => {
             nextQuestion();
@@ -140,6 +166,7 @@
     }
 
     function triggerExplosion() {
+      explodeSound.play();
       const explosion = document.createElement("div");
       explosion.className = "explosion";
       document.body.appendChild(explosion);
@@ -239,5 +266,4 @@
 
     showQuestion();
   </script>
-</body>
-</html>
+</
