@@ -2,89 +2,72 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Balance Quiz Game</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     #scale {
       transition: transform 0.5s ease-in-out;
     }
+    .weight {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      background: gray;
+      border-radius: 50%;
+      animation: drop 0.7s ease-out;
+    }
+    @keyframes drop {
+      0% { top: 0; opacity: 0; }
+      100% { top: 100px; opacity: 1; }
+    }
   </style>
 </head>
 <body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen p-4">
   <h1 class="text-3xl font-bold mb-6">Balance the Scale: Quiz Edition</h1>
 
-  <!-- Scale -->
-  <div class="relative mb-10">
-    <img id="scale" src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Balance_scale_icon.svg" alt="Scale" class="w-64 mx-auto">
+  <!-- Scale Container -->
+  <div class="relative mb-10 w-64 h-48 flex items-center justify-center">
+    <img id="scale" src="https://upload.wikimedia.org/wikipedia/commons/e/e4/Balance_scale_icon.svg" alt="Scale" class="w-full">
+    <div id="left-weights" class="absolute left-10 top-10"></div>
+    <div id="right-weights" class="absolute right-10 top-10"></div>
   </div>
 
-  <!-- Question Area -->
+  <!-- Question Box -->
   <div id="question-box" class="bg-white p-6 rounded shadow-md text-center w-full max-w-md">
     <p id="question-text" class="text-lg font-medium mb-4"></p>
     <div id="answers" class="space-y-2"></div>
   </div>
 
-  <!-- End Message -->
+  <!-- Result + Retry -->
   <div id="result" class="hidden mt-6 text-2xl font-bold text-center"></div>
+  <button id="retry" onclick="restartGame()" class="hidden mt-4 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">Try Again</button>
+
+  <!-- Sound -->
+  <audio id="drop-sound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_220a2ad759.mp3?filename=plop-103130.mp3"></audio>
 
   <script>
     const questions = [
-      {
-        question: "What is the capital of France?",
-        options: ["Rome", "Paris", "Berlin", "Madrid"],
-        answer: 1
-      },
-      {
-        question: "Which planet is known as the Red Planet?",
-        options: ["Earth", "Venus", "Mars", "Jupiter"],
-        answer: 2
-      },
-      {
-        question: "What is the largest mammal?",
-        options: ["Elephant", "Giraffe", "Blue Whale", "Hippopotamus"],
-        answer: 2
-      },
-      {
-        question: "Which element has the chemical symbol O?",
-        options: ["Oxygen", "Gold", "Silver", "Hydrogen"],
-        answer: 0
-      },
-      {
-        question: "How many continents are there?",
-        options: ["5", "6", "7", "8"],
-        answer: 2
-      },
-      {
-        question: "Which ocean is the largest?",
-        options: ["Atlantic", "Indian", "Southern", "Pacific"],
-        answer: 3
-      },
-      {
-        question: "What language is primarily spoken in Brazil?",
-        options: ["Spanish", "Portuguese", "English", "French"],
-        answer: 1
-      },
-      {
-        question: "Which gas do plants absorb from the atmosphere?",
-        options: ["Oxygen", "Hydrogen", "Carbon Dioxide", "Nitrogen"],
-        answer: 2
-      },
-      {
-        question: "What is H2O?",
-        options: ["Water", "Salt", "Acid", "Sugar"],
-        answer: 0
-      },
-      {
-        question: "Which is the smallest prime number?",
-        options: ["1", "2", "3", "5"],
-        answer: 1
-      }
+      { question: "What is the capital of France?", options: ["Rome", "Paris", "Berlin", "Madrid"], answer: 1 },
+      { question: "Which planet is known as the Red Planet?", options: ["Earth", "Venus", "Mars", "Jupiter"], answer: 2 },
+      { question: "What is the largest mammal?", options: ["Elephant", "Giraffe", "Blue Whale", "Hippopotamus"], answer: 2 },
+      { question: "Which element has the chemical symbol O?", options: ["Oxygen", "Gold", "Silver", "Hydrogen"], answer: 0 },
+      { question: "How many continents are there?", options: ["5", "6", "7", "8"], answer: 2 },
+      { question: "Which ocean is the largest?", options: ["Atlantic", "Indian", "Southern", "Pacific"], answer: 3 },
+      { question: "What language is primarily spoken in Brazil?", options: ["Spanish", "Portuguese", "English", "French"], answer: 1 },
+      { question: "Which gas do plants absorb from the atmosphere?", options: ["Oxygen", "Hydrogen", "Carbon Dioxide", "Nitrogen"], answer: 2 },
+      { question: "What is H2O?", options: ["Water", "Salt", "Acid", "Sugar"], answer: 0 },
+      { question: "Which is the smallest prime number?", options: ["1", "2", "3", "5"], answer: 1 }
     ];
 
     let currentQuestion = 0;
     let leftWeight = 0;
     let rightWeight = 0;
+
+    const scale = document.getElementById("scale");
+    const leftContainer = document.getElementById("left-weights");
+    const rightContainer = document.getElementById("right-weights");
+    const dropSound = document.getElementById("drop-sound");
 
     function showQuestion() {
       const q = questions[currentQuestion];
@@ -101,26 +84,68 @@
       });
     }
 
+    function addWeight(side) {
+      const weight = document.createElement("div");
+      weight.className = "weight";
+      if (side === "left") leftContainer.appendChild(weight);
+      else rightContainer.appendChild(weight);
+      dropSound.play();
+    }
+
     function answer(selectedIndex) {
       const correct = questions[currentQuestion].answer;
       if (selectedIndex === correct) {
         rightWeight++;
+        addWeight("right");
       } else {
         leftWeight++;
+        addWeight("left");
       }
       currentQuestion++;
       updateScale();
       if (currentQuestion < questions.length) {
-        showQuestion();
+        setTimeout(showQuestion, 300);
       } else {
-        endGame();
+        setTimeout(endGame, 800);
       }
     }
 
     function updateScale() {
-      const tilt = (rightWeight - leftWeight) * 5; // max ~50 deg
-      document.getElementById("scale").style.transform = `rotate(${tilt}deg)`;
+      const tilt = (rightWeight - leftWeight) * 5;
+      scale.style.transform = `rotate(${tilt}deg)`;
     }
 
     function endGame() {
       document.getElementById("question-box").classList.add("hidden");
+      const result = document.getElementById("result");
+      const retry = document.getElementById("retry");
+      result.classList.remove("hidden");
+      retry.classList.remove("hidden");
+
+      if (rightWeight > leftWeight) {
+        result.textContent = "🎉 Congrats You're Blended!";
+        result.classList.add("text-green-600");
+      } else {
+        result.textContent = "🔁 reBlend your knowledge.";
+        result.classList.add("text-red-600");
+      }
+    }
+
+    function restartGame() {
+      currentQuestion = 0;
+      leftWeight = 0;
+      rightWeight = 0;
+      document.getElementById("question-box").classList.remove("hidden");
+      document.getElementById("result").classList.add("hidden");
+      document.getElementById("retry").classList.add("hidden");
+      document.getElementById("result").textContent = "";
+      leftContainer.innerHTML = "";
+      rightContainer.innerHTML = "";
+      scale.style.transform = "rotate(0deg)";
+      showQuestion();
+    }
+
+    showQuestion();
+  </script>
+</body>
+</html>
