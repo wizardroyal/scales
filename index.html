@@ -35,39 +35,31 @@
         transform: scale(1);
       }
     }
-    /* Add a slight fade-in effect to result text */
-    .result-text {
-      opacity: 0;
-      transition: opacity 0.3s ease-in-out;
-    }
-    .result-text.show {
-      opacity: 1;
-    }
-    /* Bomb explosion animation */
+    /* Explosion animation */
     @keyframes explode {
       0% {
         transform: scale(1);
         opacity: 1;
       }
       50% {
-        transform: scale(1.5);
+        transform: scale(10);
         opacity: 0.5;
       }
       100% {
-        transform: scale(0);
+        transform: scale(25);
         opacity: 0;
       }
     }
     .explosion {
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 50px;
-      height: 50px;
-      background-color: red;
-      border-radius: 50%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(255, 0, 0, 0.5);
+      border-radius: 0;
       animation: explode 1s ease-out forwards;
+      z-index: 9999; /* Ensure it appears on top of everything */
     }
     /* Countdown bar */
     #countdown-bar {
@@ -266,4 +258,5 @@
 
     showQuestion();
   </script>
-</
+</body>
+</html>
