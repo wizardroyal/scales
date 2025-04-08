@@ -61,29 +61,29 @@
       animation: explode 1s ease-out forwards;
       z-index: 9999; /* Ensure it appears on top of everything */
     }
-    /* Countdown bar */
+    /* Countdown bar on the right side vertically */
     #countdown-bar {
       position: absolute;
       top: 20px;
-      left: 20px;
-      width: 100%;
-      height: 10px;
+      right: 20px;
+      width: 10px;
+      height: 100%;
       background-color: #ddd;
       border-radius: 5px;
       overflow: hidden;
     }
     #countdown-fill {
+      width: 100%;
       height: 100%;
       background-color: #ff0000;
-      width: 100%;
-      transition: width 1s linear;
+      transition: height 1s linear;
     }
   </style>
 </head>
 <body class="flex flex-col items-center justify-center min-h-screen p-4" style="background-image: linear-gradient(rgba(59, 130, 246, 0.6), rgba(139, 92, 246, 0.6)), url('https://i.imgflip.com/2qkodw.jpg?a484440'); background-position: center center; background-repeat: no-repeat; background-size: cover; background-attachment: fixed;">
   <h1 class="text-3xl font-bold mb-12" style="text-shadow: 2px 2px 5px rgba(255, 255, 255, 0.7);">Are you blended?</h1>
 
-  <!-- Countdown Bar -->
+  <!-- Countdown Bar (now vertical on the right side) -->
   <div id="countdown-bar">
     <div id="countdown-fill"></div>
   </div>
@@ -99,7 +99,6 @@
   <div id="question-box" class="bg-white p-6 rounded shadow-md text-center w-full max-w-md">
     <p id="question-text" class="text-lg font-medium mb-4"></p>
     <div id="answers" class="space-y-2"></div>
-    <p id="timer" class="mt-4 text-xl font-semibold">15</p>
   </div>
 
   <!-- Result + Retry -->
@@ -142,11 +141,11 @@
 
     function startTimer() {
       timeLeft = 15;
-      countdownFill.style.width = "100%";
+      countdownFill.style.height = "100%";
       const tickInterval = setInterval(() => {
         tickSound.play();
         timeLeft--;
-        countdownFill.style.width = `${(timeLeft / 15) * 100}%`;
+        countdownFill.style.height = `${(timeLeft / 15) * 100}%`;
         if (timeLeft <= 0) {
           clearInterval(tickInterval);
           triggerExplosion();
