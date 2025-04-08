@@ -152,6 +152,25 @@
       }
     }
 
+    function restartGame() {
+      currentQuestion = 0;
+      leftWeight = 0;
+      rightWeight = 0;
+    
+      document.getElementById("result-box").classList.add("hidden");
+      document.getElementById("retry").classList.add("hidden");
+      document.getElementById("result").textContent = "";
+    
+      document.getElementById("left-weights").innerHTML = "";
+      document.getElementById("right-weights").innerHTML = "";
+      scale.style.transform = "rotate(0deg)";
+    
+      document.getElementById("question-box").classList.remove("hidden");
+      document.getElementById("game-screen").classList.remove("hidden");
+    
+      showQuestion(); // Restart the quiz
+    }
+
     // Start the game
     showQuestion();
   </script>
