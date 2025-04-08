@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Balance Game</title>
+  <title>Balance Quiz Game</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     #scale {
@@ -12,7 +12,7 @@
   </style>
 </head>
 <body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen p-4">
-  <h1 class="text-3xl font-bold mb-6">Balance the Scale</h1>
+  <h1 class="text-3xl font-bold mb-6">Balance the Scale: Quiz Edition</h1>
 
   <!-- Scale -->
   <div class="relative mb-10">
@@ -22,27 +22,64 @@
   <!-- Question Area -->
   <div id="question-box" class="bg-white p-6 rounded shadow-md text-center w-full max-w-md">
     <p id="question-text" class="text-lg font-medium mb-4"></p>
-    <div class="space-y-2">
-      <button onclick="answer('left')" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded w-full">Left Side</button>
-      <button onclick="answer('right')" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded w-full">Right Side</button>
-    </div>
+    <div id="answers" class="space-y-2"></div>
   </div>
 
   <!-- End Message -->
-  <div id="result" class="hidden mt-6 text-xl font-semibold"></div>
+  <div id="result" class="hidden mt-6 text-2xl font-bold text-center"></div>
 
   <script>
     const questions = [
-      "Do you prefer logic or emotion?",
-      "Are you more introverted or extroverted?",
-      "Do you plan ahead or go with the flow?",
-      "Teamwork or solo missions?",
-      "Daydreamer or realist?",
-      "Rules or rebellion?",
-      "Messy or meticulous?",
-      "Forgive easily or hold grudges?",
-      "Think fast or think deep?",
-      "Adventure or comfort zone?"
+      {
+        question: "What is the capital of France?",
+        options: ["Rome", "Paris", "Berlin", "Madrid"],
+        answer: 1
+      },
+      {
+        question: "Which planet is known as the Red Planet?",
+        options: ["Earth", "Venus", "Mars", "Jupiter"],
+        answer: 2
+      },
+      {
+        question: "What is the largest mammal?",
+        options: ["Elephant", "Giraffe", "Blue Whale", "Hippopotamus"],
+        answer: 2
+      },
+      {
+        question: "Which element has the chemical symbol O?",
+        options: ["Oxygen", "Gold", "Silver", "Hydrogen"],
+        answer: 0
+      },
+      {
+        question: "How many continents are there?",
+        options: ["5", "6", "7", "8"],
+        answer: 2
+      },
+      {
+        question: "Which ocean is the largest?",
+        options: ["Atlantic", "Indian", "Southern", "Pacific"],
+        answer: 3
+      },
+      {
+        question: "What language is primarily spoken in Brazil?",
+        options: ["Spanish", "Portuguese", "English", "French"],
+        answer: 1
+      },
+      {
+        question: "Which gas do plants absorb from the atmosphere?",
+        options: ["Oxygen", "Hydrogen", "Carbon Dioxide", "Nitrogen"],
+        answer: 2
+      },
+      {
+        question: "What is H2O?",
+        options: ["Water", "Salt", "Acid", "Sugar"],
+        answer: 0
+      },
+      {
+        question: "Which is the smallest prime number?",
+        options: ["1", "2", "3", "5"],
+        answer: 1
+      }
     ];
 
     let currentQuestion = 0;
@@ -50,41 +87,40 @@
     let rightWeight = 0;
 
     function showQuestion() {
+      const q = questions[currentQuestion];
+      document.getElementById("question-text").textContent = q.question;
+      const answersDiv = document.getElementById("answers");
+      answersDiv.innerHTML = "";
+
+      q.options.forEach((opt, index) => {
+        const btn = document.createElement("button");
+        btn.textContent = opt;
+        btn.className = "bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded w-full";
+        btn.onclick = () => answer(index);
+        answersDiv.appendChild(btn);
+      });
+    }
+
+    function answer(selectedIndex) {
+      const correct = questions[currentQuestion].answer;
+      if (selectedIndex === correct) {
+        rightWeight++;
+      } else {
+        leftWeight++;
+      }
+      currentQuestion++;
+      updateScale();
       if (currentQuestion < questions.length) {
-        document.getElementById("question-text").textContent = questions[currentQuestion];
+        showQuestion();
       } else {
         endGame();
       }
     }
 
-    function answer(side) {
-      if (side === "left") leftWeight++;
-      else if (side === "right") rightWeight++;
-
-      currentQuestion++;
-      updateScale();
-      showQuestion();
-    }
-
     function updateScale() {
-      const tilt = (rightWeight - leftWeight) * 5; // tilt angle
+      const tilt = (rightWeight - leftWeight) * 5; // max ~50 deg
       document.getElementById("scale").style.transform = `rotate(${tilt}deg)`;
     }
 
     function endGame() {
       document.getElementById("question-box").classList.add("hidden");
-      const result = document.getElementById("result");
-      result.classList.remove("hidden");
-      if (leftWeight > rightWeight) {
-        result.textContent = "The scale tipped to the LEFT!";
-      } else if (rightWeight > leftWeight) {
-        result.textContent = "The scale tipped to the RIGHT!";
-      } else {
-        result.textContent = "Perfect balance! The scale is even.";
-      }
-    }
-
-    showQuestion();
-  </script>
-</body>
-</html>
