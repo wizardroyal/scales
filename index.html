@@ -101,7 +101,7 @@
     <div id="timer-fill"></div>
   </div>
 
-  <!-- Scale Container -->
+  <!-- Game Screen (Hidden Initially) -->
   <div class="relative mb-10 w-64 h-48 flex items-center justify-center hidden" id="game-screen">
     <img id="scale" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsEQazHWt18zAXh2IZYGQy0S-5cNvUlM7nsw&s" alt="Scale" class="w-full">
     <div id="left-weights" class="absolute left-10 top-10"></div>
@@ -228,4 +228,9 @@
       if (currentQuestion < questions.length) {
         setTimeout(showQuestion, 300);
       } else {
-        setTimeout(end
+        setTimeout(endGame, 800);
+      }
+    }
+
+    function updateScale() {
+      const tilt =
