@@ -38,27 +38,33 @@
     /* Explosion animation */
     @keyframes explode {
       0% {
-        transform: scale(1);
+        transform: scale(0);
         opacity: 1;
+        top: 50%;
+        left: 50%;
+        position: absolute;
+        transform-origin: center center;
       }
       50% {
-        transform: scale(10);
+        transform: scale(15);
         opacity: 0.5;
       }
       100% {
-        transform: scale(25);
+        transform: scale(50);
         opacity: 0;
+        top: 50%;
+        left: 50%;
       }
     }
     .explosion {
       position: fixed;
-      top: 0;
-      left: 0;
+      top: 50%;
+      left: 50%;
       width: 100vw;
       height: 100vh;
       background-color: rgba(255, 0, 0, 0.5);
-      border-radius: 0;
-      animation: explode 1s ease-out forwards;
+      border-radius: 50%;
+      animation: explode 3s ease-out forwards;
       z-index: 9999; /* Ensure it appears on top of everything */
     }
     /* Countdown bar on the right side vertically */
@@ -163,7 +169,7 @@
       document.body.appendChild(explosion);
       setTimeout(() => {
         explosion.remove();
-      }, 1000);
+      }, 3000); // Explosion duration of 3 seconds
     }
 
     function showQuestion() {
@@ -245,17 +251,4 @@
       currentQuestion = 0;
       leftWeight = 0;
       rightWeight = 0;
-      document.getElementById("question-box").classList.remove("hidden");
-      document.getElementById("result-box").classList.add("hidden");
-      document.getElementById("result").textContent = "";
-      document.getElementById("retry").classList.add("hidden");
-      leftContainer.innerHTML = "";
-      rightContainer.innerHTML = "";
-      scale.style.transform = "rotate(0deg)";
-      showQuestion();
-    }
-
-    showQuestion();
-  </script>
-</body>
-</html>
+      document.get
